@@ -43,13 +43,12 @@ const FormGenerator = (props: Props) => {
 
   useEffect(() => {
     console.log("State", state);
-    if (state?.message == "success") {
+    if (state?.message === "success") {
       setOpen(false);
       navigate(state.data.formId);
-      // navigate(state.data.formId, "Additional value i am passing");
     }
     console.log(state?.data);
-  }, [state?.message]);
+  }, [state?.message]); // Add state?.message to the dependency array
 
   const onFormCreate = () => {
     if (session.data?.user) {
