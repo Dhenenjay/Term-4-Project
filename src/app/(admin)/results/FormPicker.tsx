@@ -1,5 +1,5 @@
 "use client";
-import React, { use, useCallback, useEffect } from "react";
+import React, { useCallback, useEffect } from "react";
 import {
   Select,
   SelectContent,
@@ -19,7 +19,6 @@ import { Label } from "@/components/ui/label";
 import { useSearchParams, useRouter, usePathname } from "next/navigation";
 import { InferSelectModel } from "drizzle-orm";
 import { getSubmissions } from "@/app/actions/getSubmissons";
-import { cpSync } from "fs";
 
 type SelectProps = {
   value: number;
@@ -68,36 +67,14 @@ const FormsPicker = (props: FormsPickerProps) => {
 
   const createQueryString = useCallback(
     (name: string, value: string) => {
-      console.log("searchParams", searchParams);
       const params = new URLSearchParams(searchParams.toString());
       params.set(name, value);
-
       return params.toString();
     },
     [searchParams]
   );
 
-  // useEffect(() => {
-  //   const fetchData = async () => {
-  //     try {
-  //       const res = await getSubmissions(51); // Call your API function here
-  //       if (res) {
-  //         const transformedData: TableProps = {
-  //           data: res.submissions,
-  //           columns: res.questions,
-  //         };
-  //         setCols(res.questions);
-  //         setRows(res.submissions);
-  //         setData(transformedData);
-  //       }
-  //     } catch (error) {
-  //       console.error("Error fetching data:", error);
-  //     }
-  //   };
-
-  //   fetchData();
-  // }, []);
-  const fetchData = async (formId: number) => {
+  const fetchData = useCallback(async (formId: number) => {
     try {
       const res = await getSubmissions(formId);
       if (res) {
@@ -109,14 +86,14 @@ const FormsPicker = (props: FormsPickerProps) => {
         setRows(res.submissions);
         setData(transformedData);
       }
-      console.log("respnose", res);
     } catch (error) {
       console.error("Error fetching data:", error);
     }
-  };
+  }, [setCols, setRows, setData]);
+
   useEffect(() => {
     fetchData(Number(formId));
-  }, [formId]); // Include formId in the dependency array
+  }, [formId, fetchData]); // Include formId and fetchData in the dependency array
 
   return (
     <div className="flex gap-2 items-center">
